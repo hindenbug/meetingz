@@ -55,6 +55,26 @@ describe Meeting do
         expect(subject.room).to be_nil
       end
     end
+
+    context "room allocated to the meeting" do
+      let(:meeting) { Meeting.new("Meeting Title", 30) }
+      let(:room) { Room.new("Room 1") }
+
+      before { room.book!(meeting) }
+
+      it "should have a start time set" do
+        expect(meeting.start_time).to_not be_nil
+        expect(meeting.start_time).to be_a_kind_of(Time)
+      end
+
+      it "should have room allocated" do
+        expect(meeting.room).to eq(room.name)
+      end
+
+      it "succesfully prints the meeting details with schedule" do
+        expect(meeting.to_s).to match("09:00AM Meeting Title 30min")
+      end
+    end
   end
 
 end
