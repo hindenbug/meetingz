@@ -1,6 +1,6 @@
 require_relative "meeting"
 require_relative "room"
-require_relative "allocator"
+require_relative "scheduler"
 
 file = ARGV[0]
 
@@ -16,7 +16,7 @@ File.readlines(file).each do |line|
   meetings << Meeting.new(agenda, duration)
 end
 
-allocator = Allocator.new(rooms, meetings)
-allocator.allocate!
+scheduler = Scheduler.new(rooms, meetings)
+scheduler.allocate!
 
-allocator.print_chart
+scheduler.print_schedule

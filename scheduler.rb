@@ -1,11 +1,10 @@
-class Allocator
+class Scheduler
 
   def initialize(rooms, meetings)
     @rooms = rooms
     @meetings = meetings
     meetings_group = meetings.group_by { |m| m.duration } rescue {}
     @smallest_meeting = meetings_group.keys.min
-    @meetings_m = []
   end
 
   def allocate!
@@ -23,7 +22,7 @@ class Allocator
     end
   end
 
-  def print_chart
+  def print_schedule
     @rooms.each_with_index do |room, i|
       puts "Room :#{i}"
       room.meetings.each { |m| puts m }

@@ -1,9 +1,9 @@
 require "spec_helper"
-require_relative "../allocator"
+require_relative "../scheduler"
 require_relative "../meeting"
 require_relative "../room"
 
-describe Allocator do
+describe Scheduler do
 
   let(:meetings) { [
     Meeting.new("Meeting 1", "60"),
@@ -13,7 +13,7 @@ describe Allocator do
   let(:rooms) { [ Room.new("Room 1"), Room.new("Room 2") ] }
 
   describe "#allocate!" do
-    let(:allocator) { Allocator.new(rooms, meetings) }
+    let(:scheduler) { Scheduler.new(rooms, meetings) }
     let(:open_time) { Time.new(Time.now.year, Time.now.month, Time.now.day, 9, 0) }
 
     before do
@@ -23,7 +23,7 @@ describe Allocator do
     end
 
     it "should allocate all meetings to rooms" do
-      allocator.allocate!
+      scheduler.allocate!
 
       expect(meetings).to be_empty
       rooms.each_with_index do |room, i|
@@ -34,7 +34,7 @@ describe Allocator do
     it "should try and allocate all meetings" do
       meetings.push(Meeting.new("Meeting 3", "45"))
 
-      allocator.allocate!
+      scheduler.allocate!
 
       expect(meetings).to_not be_empty
 
