@@ -124,4 +124,56 @@ describe Room do
     end
   end
 
+  describe "#can_accommodate_before_lunch" do
+    let(:meeting) { Meeting.new("Meeting Title", 45) }
+    let(:room) { Room.new("Room 1") }
+
+    it "returns true if meeting is accomodated before lunch" do
+      expect(room.can_accommodate_before_lunch?(meeting)).to be_truthy
+    end
+
+    it "schedules lunch, if meeting is overruns lunch start time" do
+      allow(room).to receive(:capacity_left_before_lunch).and_return(30)
+
+      expect(room.can_accommodate_before_lunch?(meeting)).to be_falsy
+      expect { room.can_accommodate_before_lunch?(meeting) }.to change { room.meetings.count }.by(1)
+    end
+  end
+
+  describe "#can_accommodate_after_lunch" do
+    let(:meeting) { Meeting.new("Meeting Title", 45) }
+    let(:room) { Room.new("Room 1") }
+
+    it "returns true if meeting is accomodated after lunch" do
+      allow(room).to receive(:next_bookable_slot).and_return(room.close_time - 60 * 60)
+
+      expect(room.can_accommodate_after_lunch?(meeting)).to be_truthy
+    end
+
+    it "returns false if meeting overruns close time" do
+      allow(room).to receive(:capacity_left_after_lunch).and_return(30)
+
+      expect(room.can_accommodate_after_lunch?(meeting)).to be_falsy
+    end
+  end
+
+  describe "#cannot_fit meeting" do
+    let(:meeting) { Meeting.new("Meeting Title", 45) }
+    let(:room) { Room.new("Room 1") }
+
+    it "returns true if meeting cannot fit before/after lunch" do
+      allow(room).to receive(:capacity_left_before_lunch).and_return(30)
+      allow(room).to receive(:capacity_left_after_lunch).and_return(30)
+
+      expect(room.cannot_fit?(45)).to be_truthy
+    end
+
+    it "returns true if meeting cannot fit before/after lunch" do
+      allow(room).to receive(:capacity_left_before_lunch).and_return(30)
+      allow(room).to receive(:capacity_left_after_lunch).and_return(60)
+
+      expect(room.cannot_fit?(45)).to be_falsy
+    end
+  end
+
 end

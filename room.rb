@@ -32,4 +32,46 @@ class Room
     @next_bookable_slot = lunch_end
   end
 
+  def can_accommodate_before_lunch?(meeting)
+    meeting.duration <= capacity_left_before_lunch ? true : (schedule_lunch and false)
+  end
+
+  def can_accommodate_after_lunch?(meeting)
+    meeting.duration <= capacity_left_after_lunch
+  end
+
+  def cannot_fit?(min_duration)
+    capacity_left_before_lunch < min_duration && capacity_left_after_lunch < min_duration
+  end
+
+  def available_before_lunch?(meeting)
+    @next_bookable_slot < lunch_start
+  end
+
+  def available_after_lunch?(meeting)
+    @next_bookable_slot >= lunch_end && @next_bookable_slot < close_time
+  end
+
+  private
+
+  def capacity_left_before_lunch
+    original_capacity_before_lunch - @meetings.select {|x| x.start_time < @lunch_start }.inject(0) { |sum, m| sum + m.duration }
+  end
+
+  def capacity_left_after_lunch
+    original_capacity_after_lunch - @meetings.select {|x| x.start_time < @close_time && x.start_time >= @lunch_end }.inject(0) { |sum, m| sum + m.duration }
+  end
+
+  def original_capacity_before_lunch
+    (lunch_start - open_time).to_i/60
+  end
+
+  def original_capacity_after_lunch
+    (close_time - lunch_end).to_i/60
+  end
+
+  def lunch_time
+    (lunch_end - lunch_start).to_i/60
+  end
+
 end
